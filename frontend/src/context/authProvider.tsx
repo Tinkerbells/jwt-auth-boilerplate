@@ -9,11 +9,17 @@ import { useContext } from "react";
 
 const SIGN_IN_QUERY_KEY = ['sign-in'];
 const SIGN_UP_QUERY_KEY = ['sign-up'];
+const LOGOUT_QUERY_KEY = ['logout'];
 
 type AuthResponseData = {
   accessToken: string,
   profile: Profile,
 }
+
+const fetchLogout = async (): Promise<void> => {
+  const { data } = await apiClient.post(`/api/v1/auth/logout`);
+  return data;
+};
 
 const signIn = async (user: UserSignInInfo): Promise<AuthResponseData> => {
   const { data } = await apiClient.post(`/api/v1/auth/login`, user);
@@ -31,7 +37,7 @@ export interface AuthContextValue {
   user: Profile | null;
   login: UseMutateFunction<AuthResponseData, Error, UserSignInInfo>; // Update type
   register: UseMutateFunction<{ message: string }, Error, User>; // Update type
-  logout: () => void;
+  logout: UseMutateFunction
 }
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -72,11 +78,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
   });
 
-  const register = useMutation<{ message: string }, Error, User>(SIGN_UP_QUERY_KEY, signUp, {
+  const register = useMutation<{ message: string }, Error, User>(LOGOUT_QUERY_KEY, signUp, {
     onSuccess: (data) => {
       console.log(data)
-      // setUser(data.profile)
-      // setAccessToken(data.accessToken)
       navigate("/");
     },
     onError: (error) => {
@@ -84,16 +88,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
   });
 
+  const logout = useMutation(SIGN_UP_QUERY_KEY, fetchLogout, {
+    onSuccess: () => {
+      setUser(null);
+      setAccessToken(null);
+      navigate("/login", { replace: true });
+    },
+    onError: (error) => {
+      console.error(error)
+    },
+  });
+
   const { mutate: loginFunction, isLoading: isLoginLoading } = login;
+  const { mutate: logoutFunction, isLoading: isLogoutLoading } = logout;
   const { mutate: regsiterFunction, isLoading: isRegisterLoading } = register;
 
 
-  const logout = (): void => {
-    setUser(null);
-    navigate("/login", { replace: true });
-  };
+  // const logout = (): void => {
+  //   console.log("@")
+  //   setUser(null);
+  //   navigate("/login", { replace: true });
+  // };
 
-  const isLoading = isLoginLoading || isRegisterLoading
+  const isLoading = isLoginLoading || isRegisterLoading || isLogoutLoading
 
   const value = useMemo(
     () => ({
@@ -102,7 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       user,
       login: loginFunction,
       register: regsiterFunction,
-      logout,
+      logout: logoutFunction,
     }),
     [user]
   );

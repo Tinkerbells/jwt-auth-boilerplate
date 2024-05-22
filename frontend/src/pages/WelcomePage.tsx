@@ -1,3 +1,4 @@
+import { SiteHeader } from "@/components/navbar/site-header"
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/ui/loader"
 import { useAuth } from "@/context"
@@ -12,11 +13,14 @@ export const WelcomePage = () => {
     return <Navigate to="/login" />
   }
   return (
-    <div className="flex flex-col items-center justify-center gap-6 p-10 h-[100vh]">
-      <h1>Welcome {user.username}</h1>
-      <Button onClick={() => mutate()}>
-        {isLoading ? <Loader className="w-4 h-4" /> : (data?.message || "secret")}
-      </Button>
-    </div>
+    <>
+      <SiteHeader />
+      <main className="flex flex-col items-center justify-center gap-6 p-10 h-[calc(100vh_-_66px)]">
+        <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">Welcome Message</h1>
+        <Button onClick={() => mutate()} variant={"outline"}>
+          {isLoading ? <Loader className="w-4 h-4" /> : (data?.message || "Get auth secret message")}
+        </Button>
+      </main>
+    </>
   )
 }

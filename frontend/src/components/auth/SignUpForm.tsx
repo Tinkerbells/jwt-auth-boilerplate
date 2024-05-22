@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { z } from 'zod';
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { EvaluatePasswordStrengthType, evaluatePasswordStrength } from '@/utils';
 import { InputConform } from '../conform/Input';
 import { cn } from '@/lib/utils';
@@ -19,7 +19,9 @@ const UserSubscriptionSchema = z.object({
   password: z.string({ required_error: 'Password is required' }).min(8, { message: "Password must be at least 8 characters long" }),
 });
 
-export const SignUpForm = () => {
+interface SignUpFormProps extends React.HTMLAttributes<HTMLFormElement> { }
+
+export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
   const { register, isLoading } = useAuth()
   const [strength, setStrength] = useState<EvaluatePasswordStrengthType>({
     value: 0,
@@ -49,29 +51,30 @@ export const SignUpForm = () => {
       method="POST"
       id={form.id}
       onSubmit={form.onSubmit}
-      className="flex flex-col items-center gap-6 min-w-[20%] px-12 py-12 border rounded-xl"
+      className={cn("flex flex-col items-center gap-4 px-12 mt-6 w-full", className)} {...props}
+      {...props}
     >
       <Field>
-        <Label htmlFor={fields.email.id}>Email</Label>
-        <InputConform meta={fields.email} type="text" className='w-full' />
+        <Label htmlFor={fields.email.id} className='sr-only'>Email</Label>
+        <InputConform meta={fields.email} type="text" className='w-full' placeholder='name@example.com' />
         {fields.email.errors && <FieldError>{fields.email.errors}</FieldError>}
       </Field>
       <Field>
-        <Label htmlFor={fields.username.id}>Username</Label>
-        <InputConform meta={fields.username} type="text" className='w-full' />
+        <Label htmlFor={fields.username.id} className='sr-only'>Username</Label>
+        <InputConform meta={fields.username} type="text" placeholder='username' className='w-full' />
         {fields.username.errors && <FieldError>{fields.username.errors}</FieldError>}
       </Field>
       <Field>
-        <Label htmlFor={fields.email.id}>Password</Label>
-        <InputConform meta={fields.password} type="password" onChange={(e) => {
+        <Label htmlFor={fields.email.id} className='sr-only'>Password</Label>
+        <InputConform meta={fields.password} type="password" placeholder='password' onChange={(e) => {
           const password = e.target.value
           console.log(strength)
           setStrength(evaluatePasswordStrength(password))
         }} />
         {fields.password.errors && <FieldError>{fields.password.errors}</FieldError>}
-        <Progress max={100} value={strength.value} className={cn("h-2", strength.color)} />
+        <Progress max={100} value={strength.value} className="h-2" indicatorColor={strength.color} />
       </Field>
-      <Button className='w-full' type='submit'>Sign up</Button>
+      <Button className='w-full' variant={"outline"} type='submit' disabled={isLoading}>Sign up</Button>
     </form>
   )
 }

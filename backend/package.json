@@ -20,7 +20,7 @@
     "test": "jest",
     "test:watch": "jest -i --watchAll",
     "coverage": "jest -i --coverage",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install backend/.husky"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",

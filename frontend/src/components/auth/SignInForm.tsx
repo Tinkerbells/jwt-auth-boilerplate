@@ -17,9 +17,9 @@ const UserSubscriptionSchema = z.object({
 });
 
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> { }
+interface SignInFormProps extends React.HTMLAttributes<HTMLFormElement> { }
 
-export const SignInForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
+export const SignInForm: FC<SignInFormProps> = ({ className, ...props }) => {
   const { login, isLoading } = useAuth()
   const [form, fields] = useForm({
     id: 'signin',
@@ -43,7 +43,7 @@ export const SignInForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
       method="POST"
       id={form.id}
       onSubmit={form.onSubmit}
-      className={cn("flex flex-col items-center gap-4 px-12 py-2 mt-4 w-full", className)} {...props}
+      className={cn("flex flex-col items-center gap-4 px-12 mt-6 w-full", className)} {...props}
       {...props}
     >
       <Field>

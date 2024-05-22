@@ -83,7 +83,6 @@ export const handleSignUp = async (
     });
 
     // Send an email with the verification link
-    console.log('@token', token)
     sendVerifyEmail(email, token);
 
     res.status(httpStatus.CREATED).json({ message: 'New user created' });
