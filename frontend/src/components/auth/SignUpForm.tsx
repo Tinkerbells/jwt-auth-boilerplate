@@ -1,4 +1,4 @@
-import { Field, FieldError } from '@/components/Field';
+import { Field, FieldError } from '../ui/field';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
@@ -22,7 +22,7 @@ const UserSubscriptionSchema = z.object({
 interface SignUpFormProps extends React.HTMLAttributes<HTMLFormElement> { }
 
 export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
-  const { register, isLoading } = useAuth()
+  const { register, isLoading, isError, registerError: error } = useAuth()
   const [strength, setStrength] = useState<EvaluatePasswordStrengthType>({
     value: 0,
     color: ""
@@ -43,9 +43,7 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
     shouldRevalidate: 'onInput',
   });
 
-  if (isLoading) {
-    return <Loader />
-  }
+  console.log(error?.response?.status)
   return (
     <form
       method="POST"
@@ -56,17 +54,18 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
     >
       <Field>
         <Label htmlFor={fields.email.id} className='sr-only'>Email</Label>
-        <InputConform meta={fields.email} type="text" className='w-full' placeholder='name@example.com' />
+        <InputConform meta={fields.email} type="text" className='w-full' placeholder='name@example.com' disabled={isLoading} />
         {fields.email.errors && <FieldError>{fields.email.errors}</FieldError>}
+        {isError && error?.response?.status === 409 && <FieldError>Email already exist</FieldError>}
       </Field>
       <Field>
         <Label htmlFor={fields.username.id} className='sr-only'>Username</Label>
-        <InputConform meta={fields.username} type="text" placeholder='username' className='w-full' />
+        <InputConform meta={fields.username} type="text" placeholder='username' className='w-full' disabled={isLoading} />
         {fields.username.errors && <FieldError>{fields.username.errors}</FieldError>}
       </Field>
       <Field>
         <Label htmlFor={fields.email.id} className='sr-only'>Password</Label>
-        <InputConform meta={fields.password} type="password" placeholder='password' onChange={(e) => {
+        <InputConform meta={fields.password} type="password" placeholder='password' disabled={isLoading} onChange={(e) => {
           const password = e.target.value
           console.log(strength)
           setStrength(evaluatePasswordStrength(password))
@@ -74,7 +73,9 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
         {fields.password.errors && <FieldError>{fields.password.errors}</FieldError>}
         <Progress max={100} value={strength.value} className="h-2" indicatorColor={strength.color} />
       </Field>
-      <Button className='w-full' variant={"outline"} type='submit' disabled={isLoading}>Sign up</Button>
+      <Button className='w-full' variant={"outline"} type='submit' disabled={isLoading}>
+        {isLoading ? <Loader className='w-5 h-5' /> : "Sign up"}
+      </Button>
     </form>
   )
 }

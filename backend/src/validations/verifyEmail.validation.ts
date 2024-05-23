@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import type { EmailRequestBody } from '../types/types';
+import { type EmailVerificationCode } from '@prisma/client';
 
 export const sendVerifyEmailSchema = {
   body: Joi.object<EmailRequestBody>().keys({
@@ -8,7 +9,7 @@ export const sendVerifyEmailSchema = {
 };
 
 export const verifyEmailSchema = {
-  params: Joi.object().keys({
-    token: Joi.string().required().min(1)
+  body: Joi.object<EmailVerificationCode>().keys({
+    otp: Joi.string().required().min(6)
   })
 };

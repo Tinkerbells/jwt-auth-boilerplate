@@ -26,7 +26,6 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.log("error", error);
     const originalRequest = error.config;
     if (error.response.status === 403) {
       originalRequest._retry = true;

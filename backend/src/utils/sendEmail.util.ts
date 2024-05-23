@@ -32,15 +32,15 @@ export const sendResetEmail = (email: string, token: string) => {
  * @param {string} email - The email of the user
  * @param {string} token - The email verification token
  */
-export const sendVerifyEmail = (email: string, token: string) => {
-  const verifyLink = `${config.server.url}/api/v1/verify-email/${token}`;
+export const sendVerifyEmail = (email: string, otp: string) => {
+  // const verifyLink = `${config.server.url}/api/v1/verify-email/${token}`;
   const mailOptions = {
     from: config.email.from,
     to: email,
     subject: 'Email verification',
-    html: `Please click <a href="${verifyLink}">here</a> to verify your email.`
+    html: `Type this code <b>${otp}</b> to verify your email.`
   };
-  console.log(verifyLink);
+  console.log(otp);
   transporter?.sendMail(mailOptions, (error, info) => {
     if (error) {
       logger.error(error);

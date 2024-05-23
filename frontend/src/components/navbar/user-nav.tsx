@@ -11,6 +11,10 @@ import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { useAuth } from "@/context"
 
+const avatarUrl = (seed: string) => {
+  return `https://api.dicebear.com/8.x/micah/svg?seed=${seed}&baseColor=f9c9b6&hair=dannyPhantom,fonze,full,mrT,pixie&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
+
 export function UserNav() {
   const { user, logout } = useAuth()
   return (
@@ -18,7 +22,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarImage src={user ? avatarUrl(user.username) : ""} alt={"@" + user?.username} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </Button>

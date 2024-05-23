@@ -1,4 +1,5 @@
 export * from "./SignUpPage"
+export * from "./VerifyOtpPage"
 export * from "./SignInPage"
 export * from "./WelcomePage"
 export * from "./Protected"

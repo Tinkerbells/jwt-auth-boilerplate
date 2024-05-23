@@ -47,6 +47,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', passwordRouter);
 
 app.use('/api/v1', verifyEmailRouter);
+
 app.get('/ping', (_req, res) => {
   console.log('Server is healthy')
   res.status(200).json({ hello: 'world' })

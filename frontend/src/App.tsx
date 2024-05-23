@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Protected, SignInPage, SignUpPage, WelcomePage } from "./pages";
+import { Protected, SignInPage, SignUpPage, VerifyOtpPage, WelcomePage } from "./pages";
 
 function App() {
   return (
@@ -12,8 +12,9 @@ function App() {
           </Protected>
         }
       />
-      <Route path="/login" element={<SignInPage />} />
-      <Route path="/register" element={<SignUpPage />} />
+      <Route path="/signin" element={<SignInPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/verify-email" element={<VerifyOtpPage />} />
     </Routes>
   );
 }

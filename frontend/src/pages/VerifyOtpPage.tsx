@@ -1,18 +1,19 @@
+
 import { Link } from "react-router-dom";
-import { SignUpForm } from "../components/auth";
 import { buttonVariants } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import { AuroraBackground } from "@/components/aurora/aurora-bg";
 import { motion } from "framer-motion";
+import { VerifyOtpForm } from "@/components/auth";
 
-export const SignUpPage = () => {
+export const VerifyOtpPage = () => {
   return (
     <>
       <div className="container relative flex h-[100vh] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div className="absolute right-4 top-4 md:right-8 md:top-8 flex items-center gap-2">
           <Link
-            to="/signin"
+            to="/signup"
             className={buttonVariants({ variant: "ghost" })}
           >
             Sign in
@@ -42,32 +43,15 @@ export const SignUpPage = () => {
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center items-center sm:w-[450px]">
-            <div className="flex flex-col space-y-2 text-center">
+            <div className="flex flex-col space-y-2 text-center items-center">
               <h1 className="text-2xl font-semibold tracking-tight">
-                Create an account
+                Verify email
               </h1>
               <p className="text-sm text-muted-foreground">
-                Enter your information to create an account
+                Please enter the verification code sent to your email.
               </p>
             </div>
-            <SignUpForm />
-            <p className="px-8 text-center text-sm text-muted-foreground mt-4 sm:w-[350px]">
-              By clicking continue, you agree to our{" "}
-              <Link
-                to="/"
-                className="underline underline-offset-4 hover:text-primary"
-              >
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link
-                to="/"
-                className="underline underline-offset-4 hover:text-primary"
-              >
-                Privacy Policy
-              </Link>
-              .
-            </p>
+            <VerifyOtpForm />
           </div>
         </div>
       </div>

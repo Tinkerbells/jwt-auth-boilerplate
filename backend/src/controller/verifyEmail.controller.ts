@@ -1,9 +1,9 @@
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import httpStatus from 'http-status';
-import { randomUUID } from 'crypto';
 import prismaClient from '../config/prisma';
-import type { EmailRequestBody, TypedRequest } from '../types/types';
+import type { EmailRequestBody, EmailVerifyRequestBody, TypedRequest } from '../types/types';
 import { sendVerifyEmail } from '../utils/sendEmail.util';
+import generateOTP from '../utils/generateOTP.util';
 
 /**
  * Sends Verification email
@@ -43,7 +43,7 @@ export const sendVerificationEmail = async (
   }
 
   // Check if there is an existing verification token that has not expired
-  const existingToken = await prismaClient.emailVerificationToken.findFirst({
+  const existingToken = await prismaClient.emailVerificationCode.findFirst({
     where: {
       user: { id: user.id },
       expiresAt: { gt: new Date() }
@@ -57,34 +57,37 @@ export const sendVerificationEmail = async (
   }
 
   // Generate a new verification token and save it to the database
-  const token = randomUUID();
+  const otp = generateOTP()
+  // const token = randomUUID();
   const expiresAt = new Date(Date.now() + 3600000); // Token expires in 1 hour
-  await prismaClient.emailVerificationToken.create({
+  await prismaClient.emailVerificationCode.create({
     data: {
-      token,
+      otp,
       expiresAt,
       userId: user.id
     }
   });
 
   // Send an email with the new verification link
-  sendVerifyEmail(email, token);
+  sendVerifyEmail(email, otp);
 
   // Return a success message
   return res.status(httpStatus.OK).json({ message: 'Verification email sent' });
 };
 
-export const handleVerifyEmail = async (req: Request, res: Response) => {
-  const { token } = req.params;
+export const handleVerifyEmail = async (
+  req: TypedRequest<EmailVerifyRequestBody>,
+  res: Response) => {
+  const { otp } = req.body;
 
-  if (!token) return res.sendStatus(httpStatus.NOT_FOUND);
+  if (!otp) return res.sendStatus(httpStatus.NOT_FOUND);
 
   // Check if the token exists in the database and is not expired
-  const verificationToken = await prisma?.emailVerificationToken.findUnique({
-    where: { token }
+  const verificationOtp = await prisma?.emailVerificationCode.findUnique({
+    where: { otp }
   });
 
-  if (!verificationToken || verificationToken.expiresAt < new Date()) {
+  if (!verificationOtp || verificationOtp.expiresAt < new Date()) {
     return res
       .status(httpStatus.NOT_FOUND)
       .json({ error: 'Invalid or expired token' });
@@ -92,13 +95,13 @@ export const handleVerifyEmail = async (req: Request, res: Response) => {
 
   // Update the user's email verification status in the database
   await prismaClient.user.update({
-    where: { id: verificationToken.userId },
+    where: { id: verificationOtp.userId },
     data: { emailVerified: new Date() }
   });
 
   // Delete the verification tokens that the user owns form the database
-  await prismaClient.emailVerificationToken.deleteMany({
-    where: { userId: verificationToken.userId }
+  await prismaClient.emailVerificationCode.deleteMany({
+    where: { userId: verificationOtp.userId }
   });
 
   // Return a success message

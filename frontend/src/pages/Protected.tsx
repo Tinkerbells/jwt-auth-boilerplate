@@ -10,7 +10,7 @@ export const Protected: FC<ProtectedProps> = ({ children }) => {
   const { user } = useAuth();
   if (!user) {
     // user is not authenticated
-    return <Navigate to="/login" />;
+    return <Navigate to="/signin" />;
   }
   return children;
 };

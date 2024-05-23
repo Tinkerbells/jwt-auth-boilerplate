@@ -8,7 +8,7 @@ import type { IFilterXSSOptions } from 'xss';
 
 export type RequireAtLeastOne<T> = {
   [K in keyof T]-?: Required<Pick<T, K>> &
-    Partial<Pick<T, Exclude<keyof T, K>>>;
+  Partial<Pick<T, Exclude<keyof T, K>>>;
 }[keyof T];
 
 // More strictly typed Express.Request type
@@ -53,6 +53,9 @@ export type UserLoginCredentials = Omit<UserSignUpCredentials, 'username'>;
 export interface EmailRequestBody {
   email: string;
 }
+export interface EmailVerifyRequestBody {
+  otp: string;
+}
 
 export interface ResetPasswordRequestBodyType {
   newPassword: string;
@@ -62,8 +65,8 @@ export type Sanitized<T> = T extends (...args: unknown[]) => unknown
   ? T // if T is a function, return it as is
   : T extends object
   ? {
-      readonly [K in keyof T]: Sanitized<T[K]>;
-    }
+    readonly [K in keyof T]: Sanitized<T[K]>;
+  }
   : T;
 
 export type SanitizeOptions = IFilterXSSOptions & {

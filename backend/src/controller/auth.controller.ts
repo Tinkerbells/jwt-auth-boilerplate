@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { randomUUID } from 'crypto';
 import * as argon2 from 'argon2';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import prismaClient from '../config/prisma';
@@ -22,6 +21,7 @@ import {
 
 import { sendVerifyEmail } from '../utils/sendEmail.util';
 import logger from '../middleware/logger';
+import generateOTP from '../utils/generateOTP.util';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -71,19 +71,19 @@ export const handleSignUp = async (
       }
     });
 
-    const token = randomUUID();
+    const otp = generateOTP()
     const expiresAt = new Date(Date.now() + 3600000); // Token expires in 1 hour
 
-    await prismaClient.emailVerificationToken.create({
+    await prismaClient.emailVerificationCode.create({
       data: {
-        token,
+        otp,
         expiresAt,
         userId: newUser.id
       }
     });
 
     // Send an email with the verification link
-    sendVerifyEmail(email, token);
+    sendVerifyEmail(email, otp);
 
     res.status(httpStatus.CREATED).json({ message: 'New user created' });
   } catch (err) {
@@ -136,7 +136,6 @@ export const handleLogin = async (
 
   try {
     const isPasswordCorrect = await argon2.verify(user.password, password)
-    console.log('isPasswordCorrect', isPasswordCorrect)
     if (isPasswordCorrect) {
       // if there is a refresh token in the req.cookie, then we need to check if this
       // refresh token exists in the database and belongs to the current user than we need to delete it
@@ -202,7 +201,6 @@ export const handleLogin = async (
 
       return res.json({ accessToken, profile });
     } else {
-      console.log('@')
       return res.sendStatus(httpStatus.UNAUTHORIZED);
     }
   } catch (err) {
