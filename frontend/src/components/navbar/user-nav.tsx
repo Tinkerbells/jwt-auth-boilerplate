@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { useAuth } from "@/context"
+import { useAuth } from "@/providers"
 
 const avatarUrl = (seed: string) => {
   return `https://api.dicebear.com/8.x/micah/svg?seed=${seed}&baseColor=f9c9b6&hair=dannyPhantom,fonze,full,mrT,pixie&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`

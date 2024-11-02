@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/navbar/site-header"
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/ui/loader"
-import { useAuth } from "@/context"
+import { useAuth } from "@/providers"
 import { useSecret } from "@/hooks"
 import { Navigate } from "react-router-dom"
 

@@ -8,15 +8,15 @@ import config from '../config/config';
  * @param {string} email - The email of the user
  * @param {string} token - The reset password token
  */
-export const sendResetEmail = (email: string, token: string) => {
-  const resetLink = `${config.server.url}/api/v1/reset-password/${token}`;
+export const sendResetEmail = (email: string, code: string) => {
+  // const resetLink = `${config.server.url}/api/v1/reset-password/${token}`;
   const mailOptions = {
     from: config.email.from,
     to: email,
     subject: 'Password reset',
-    html: `Please click <a href="${resetLink}">here</a> to reset your password.`
+    html: `Type this code <b>${code}</b> to reset your password.`
   };
-  console.log(resetLink);
+  logger.info('Reset password code: ' + code);
   transporter?.sendMail(mailOptions, (error, info) => {
     if (error) {
       logger.error(error);
@@ -32,15 +32,15 @@ export const sendResetEmail = (email: string, token: string) => {
  * @param {string} email - The email of the user
  * @param {string} token - The email verification token
  */
-export const sendVerifyEmail = (email: string, otp: string) => {
+export const sendVerifyEmail = (email: string, code: string) => {
   // const verifyLink = `${config.server.url}/api/v1/verify-email/${token}`;
   const mailOptions = {
     from: config.email.from,
     to: email,
     subject: 'Email verification',
-    html: `Type this code <b>${otp}</b> to verify your email.`
+    html: `Type this code <b>${code}</b> to verify your email.`
   };
-  console.log(otp);
+  logger.info('Email verification code: ' + code);
   transporter?.sendMail(mailOptions, (error, info) => {
     if (error) {
       logger.error(error);

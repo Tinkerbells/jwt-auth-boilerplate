@@ -38,7 +38,7 @@ model User {
   createdAt              DateTime                 @default(now())
   accounts               Account[]
   refreshTokens          RefreshToken[]
-  resetToken             ResetToken[]
+  resetCode             ResetCode[]
   EmailVerificationCode EmailVerificationCode[]
 }
 
@@ -50,9 +50,9 @@ model RefreshToken {
   createdAt DateTime @default(now())
 }
 
-model ResetToken {
+model ResetCode {
   id        String   @id @default(cuid())
-  token     String   @unique
+  code      String   @unique
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
   userId    String
@@ -61,7 +61,7 @@ model ResetToken {
 
 model EmailVerificationCode {
   id        String   @id @default(cuid())
-  otp     String   @unique
+  code      String   @unique
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
   userId    String

@@ -1,5 +1,15 @@
-import { Routes, Route } from "react-router-dom";
-import { Protected, SignInPage, SignUpPage, VerifyOtpPage, WelcomePage } from "./pages";
+import { Route, Routes } from "react-router-dom"
+
+import ROUTES from "./consts/routes"
+import {
+  ForgotPasswordPage,
+  Protected,
+  ResetPasswordPage,
+  SignInPage,
+  SignUpPage,
+  VerifyOtpPage,
+  WelcomePage,
+} from "./pages"
 
 function App() {
   return (
@@ -12,11 +22,13 @@ function App() {
           </Protected>
         }
       />
-      <Route path="/signin" element={<SignInPage />} />
-      <Route path="/signup" element={<SignUpPage />} />
-      <Route path="/verify-email" element={<VerifyOtpPage />} />
+      <Route path={ROUTES.SIGN_IN} element={<SignInPage />} />
+      <Route path={ROUTES.SIGN_UP} element={<SignUpPage />} />
+      <Route path={ROUTES.VERIFY + "/:type"} element={<VerifyOtpPage />} />
+      <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+      <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
     </Routes>
-  );
+  )
 }
 
-export default App;
+export default App

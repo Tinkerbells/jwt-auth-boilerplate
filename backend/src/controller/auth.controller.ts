@@ -21,7 +21,7 @@ import {
 
 import { sendVerifyEmail } from '../utils/sendEmail.util';
 import logger from '../middleware/logger';
-import generateOTP from '../utils/generateOTP.util';
+import generateOtpCode from '../utils/generateOTP.util';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
@@ -71,19 +71,19 @@ export const handleSignUp = async (
       }
     });
 
-    const otp = generateOTP()
+    const code = generateOtpCode();
     const expiresAt = new Date(Date.now() + 3600000); // Token expires in 1 hour
 
     await prismaClient.emailVerificationCode.create({
       data: {
-        otp,
+        code,
         expiresAt,
         userId: newUser.id
       }
     });
 
     // Send an email with the verification link
-    sendVerifyEmail(email, otp);
+    sendVerifyEmail(email, code);
 
     res.status(httpStatus.CREATED).json({ message: 'New user created' });
   } catch (err) {
@@ -123,11 +123,15 @@ export const handleLogin = async (
     }
   });
 
-  if (!user) return res.sendStatus(httpStatus.UNAUTHORIZED);
+  if (!user) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .json({ message: 'Account not found' });
+  }
 
   // check if email is verified
   if (!user.emailVerified) {
-    res.status(httpStatus.UNAUTHORIZED).json({
+    return res.status(httpStatus.UNAUTHORIZED).json({
       message: 'Your email is not verified! Please confirm your email!'
     });
   }
@@ -135,14 +139,13 @@ export const handleLogin = async (
   // check password
 
   try {
-    const isPasswordCorrect = await argon2.verify(user.password, password)
+    const isPasswordCorrect = await argon2.verify(user.password, password);
     if (isPasswordCorrect) {
       // if there is a refresh token in the req.cookie, then we need to check if this
       // refresh token exists in the database and belongs to the current user than we need to delete it
       // if the token does not belong to the current user, then we delete all refresh tokens
       // of the user stored in the db to be on the safe site
       // we also clear the cookie in both cases
-      console.log('@')
       if (cookies?.[config.jwt.refresh_token.cookie_name]) {
         // check if the given refresh token is from the current user
         const checkRefreshToken = await prismaClient.refreshToken.findUnique({
@@ -197,14 +200,16 @@ export const handleLogin = async (
       const profile = {
         username: user.name,
         email: user.email
-      }
+      };
 
       return res.json({ accessToken, profile });
     } else {
-      return res.sendStatus(httpStatus.UNAUTHORIZED);
+      return res
+        .status(httpStatus.UNAUTHORIZED)
+        .json({ message: 'Incorrect password' });
     }
   } catch (err) {
-    return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR);
   }
 };
 

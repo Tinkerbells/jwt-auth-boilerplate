@@ -1,25 +1,24 @@
-import { Link } from "react-router-dom";
-import { SignUpForm } from "../components/auth";
-import { buttonVariants } from "@/components/ui/button";
-import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Toaster } from "@/components/ui/toaster";
-import { AuroraBackground } from "@/components/aurora/aurora-bg";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"
+import { Link } from "react-router-dom"
+
+import { buttonVariants } from "@/components/ui/button"
+import { ModeToggle } from "@/components/ui/mode-toggle"
+import { Toaster } from "@/components/ui/toaster"
+import { AuroraBackground } from "@/components/aurora/aurora-bg"
+
+import { SignUpForm } from "../components/auth"
 
 export const SignUpPage = () => {
   return (
     <>
       <div className="container relative flex h-[100vh] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-        <div className="absolute right-4 top-4 md:right-8 md:top-8 flex items-center gap-2">
-          <Link
-            to="/signin"
-            className={buttonVariants({ variant: "ghost" })}
-          >
+        <div className="absolute right-4 top-4 flex items-center gap-2 md:right-8 md:top-8">
+          <Link to="/sign-in" className={buttonVariants({ variant: "ghost" })}>
             Sign in
           </Link>
           <ModeToggle />
         </div>
-        <div className="relative hidden h-full flex-col bg-muted text-white lg:flex dark:border-r">
+        <div className="relative hidden h-full flex-col bg-muted text-white dark:border-r lg:flex">
           <AuroraBackground>
             <motion.div
               initial={{ opacity: 0.0, y: 40 }}
@@ -29,19 +28,25 @@ export const SignUpPage = () => {
                 duration: 0.8,
                 ease: "easeInOut",
               }}
-              className="relative flex flex-col gap-4 items-center justify-center px-4"
+              className="relative flex flex-col items-center justify-center gap-4 px-4"
             >
-              <div className="text-3xl md:text-7xl font-bold dark:text-white text-center">
+              <div className="text-center text-3xl font-bold dark:text-white md:text-7xl">
                 Welcome to Auth boilerplate
               </div>
-              <div className="font-extralight text-base md:text-4xl dark:text-neutral-200 py-4 text-center">
-                Install the boilerplate from  <a href="https://github.com/Tinkerbells/jwt-auth-boilerplate" className="underline">Github</a>
+              <div className="py-4 text-center text-base font-extralight dark:text-neutral-200 md:text-4xl">
+                Install the boilerplate from{" "}
+                <a
+                  href="https://github.com/Tinkerbells/jwt-auth-boilerplate"
+                  className="underline"
+                >
+                  Github
+                </a>
               </div>
             </motion.div>
           </AuroraBackground>
         </div>
         <div className="lg:p-8">
-          <div className="mx-auto flex w-full flex-col justify-center items-center sm:w-[450px]">
+          <div className="mx-auto flex w-full flex-col items-center justify-center sm:w-[450px]">
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
                 Create an account
@@ -51,7 +56,7 @@ export const SignUpPage = () => {
               </p>
             </div>
             <SignUpForm />
-            <p className="px-8 text-center text-sm text-muted-foreground mt-4 sm:w-[350px]">
+            <p className="mt-4 px-8 text-center text-sm text-muted-foreground sm:w-[350px]">
               By clicking continue, you agree to our{" "}
               <Link
                 to="/"

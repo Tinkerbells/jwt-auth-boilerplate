@@ -1,9 +1,13 @@
 import type { Response } from 'express';
 import httpStatus from 'http-status';
 import prismaClient from '../config/prisma';
-import type { EmailRequestBody, EmailVerifyRequestBody, TypedRequest } from '../types/types';
+import type {
+  EmailRequestBody,
+  TypedRequest,
+  VerifyRequestBody
+} from '../types/types';
 import { sendVerifyEmail } from '../utils/sendEmail.util';
-import generateOTP from '../utils/generateOTP.util';
+import generateOtpCode from '../utils/generateOTP.util';
 
 /**
  * Sends Verification email
@@ -57,34 +61,39 @@ export const sendVerificationEmail = async (
   }
 
   // Generate a new verification token and save it to the database
-  const otp = generateOTP()
+  const code = generateOtpCode();
   // const token = randomUUID();
   const expiresAt = new Date(Date.now() + 3600000); // Token expires in 1 hour
   await prismaClient.emailVerificationCode.create({
     data: {
-      otp,
+      code,
       expiresAt,
       userId: user.id
     }
   });
 
   // Send an email with the new verification link
-  sendVerifyEmail(email, otp);
+  sendVerifyEmail(email, code);
 
   // Return a success message
   return res.status(httpStatus.OK).json({ message: 'Verification email sent' });
 };
 
 export const handleVerifyEmail = async (
-  req: TypedRequest<EmailVerifyRequestBody>,
-  res: Response) => {
-  const { otp } = req.body;
+  req: TypedRequest<VerifyRequestBody>,
+  res: Response
+) => {
+  const { code, email } = req.body;
 
-  if (!otp) return res.sendStatus(httpStatus.NOT_FOUND);
+  if (!code || !email) {
+    return res
+      .sendStatus(httpStatus.NOT_FOUND)
+      .json({ message: 'Email and code are required!' });
+  }
 
   // Check if the token exists in the database and is not expired
   const verificationOtp = await prisma?.emailVerificationCode.findUnique({
-    where: { otp }
+    where: { code }
   });
 
   if (!verificationOtp || verificationOtp.expiresAt < new Date()) {

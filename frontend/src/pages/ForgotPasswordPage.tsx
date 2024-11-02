@@ -1,20 +1,10 @@
-import ROUTES from "@/consts/routes"
-import { VERIFY_ROUTE, VerifyRouteType } from "@/types"
-import { Link, Navigate, useParams } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import { buttonVariants } from "@/components/ui/button"
 import { ModeToggle } from "@/components/ui/mode-toggle"
-import { Toaster } from "@/components/ui/toaster"
-import { VerifyOtpForm } from "@/components/auth/VerifyOtpForm"
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm"
 
-export const VerifyOtpPage = () => {
-  const { type } = useParams<VerifyRouteType>()
-  if (!type) {
-    return <Navigate to={ROUTES.SIGN_IN} />
-  }
-  if (!Object.values(VERIFY_ROUTE).includes(type)) {
-    return <Navigate to={ROUTES.SIGN_IN} />
-  }
+export const ForgotPasswordPage = () => {
   return (
     <>
       <div className="container relative grid h-[100vh] max-w-none items-center justify-center lg:px-0">
@@ -26,19 +16,18 @@ export const VerifyOtpPage = () => {
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col items-center justify-center sm:w-[450px]">
-            <div className="flex flex-col items-center space-y-2 text-center">
+            <div className="flex flex-col space-y-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight">
-                Type code
+                Recover your password
               </h1>
               <p className="text-sm text-muted-foreground">
-                Please enter the verification code sent to your email.
+                Enter your email address to get a password reset code
               </p>
             </div>
-            <VerifyOtpForm type={type} />
+            <ForgotPasswordForm />
           </div>
         </div>
       </div>
-      <Toaster />
     </>
   )
 }

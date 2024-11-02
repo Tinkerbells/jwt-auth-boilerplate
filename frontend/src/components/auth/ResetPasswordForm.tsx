@@ -1,9 +1,11 @@
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
+import ROUTES from "@/consts/routes"
 import { useAuth } from "@/providers"
-import { User } from "@/types"
 import { evaluatePasswordStrength, EvaluatePasswordStrengthType } from "@/utils"
 import { useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
+import { useCookies } from "react-cookie"
+import { Navigate } from "react-router-dom"
 import { z } from "zod"
 
 import { cn } from "@/lib/utils"
@@ -15,12 +17,8 @@ import { Field, FieldError } from "../ui/field"
 import Loader from "../ui/loader"
 import { Progress } from "../ui/progress"
 
-const SignUpSchema = z
+const ResetPassowrdSchema = z
   .object({
-    email: z
-      .string({ required_error: "Email is required" })
-      .email({ message: "Incorrect format" }),
-    username: z.string({ required_error: "Username is required" }),
     password: z
       .string({ required_error: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters long" }),
@@ -31,10 +29,20 @@ const SignUpSchema = z
     path: ["confirm"],
   })
 
-interface SignUpFormProps extends React.HTMLAttributes<HTMLFormElement> {}
+interface ResetPasswordFormProps
+  extends React.HTMLAttributes<HTMLFormElement> {}
 
-export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
-  const { register, isLoading, isError, registerError: error } = useAuth()
+export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({
+  className,
+  ...props
+}) => {
+  const [resetCodeCookie] = useCookies(["reset-code"])
+  const {
+    resetPassword,
+    isLoading,
+    isError,
+    resetPasswordError: error,
+  } = useAuth()
   const [strength, setStrength] = useState<EvaluatePasswordStrengthType>({
     value: 0,
     color: "",
@@ -42,14 +50,20 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
   const [form, fields] = useForm({
     id: "sign-up",
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: SignUpSchema })
+      return parseWithZod(formData, { schema: ResetPassowrdSchema })
     },
     onSubmit(e) {
       e.preventDefault()
       const form = e.currentTarget
       const formData = new FormData(form)
-      const result = parseWithZod(formData, { schema: SignUpSchema })
-      register(result.payload as User)
+      const result = parseWithZod(formData, { schema: ResetPassowrdSchema })
+      if (result.status !== "success") {
+        return result.reply()
+      }
+      resetPassword({
+        newPassword: result.value.password,
+        code: resetCodeCookie["reset-code"].toString(),
+      })
     },
     shouldRevalidate: "onInput",
   })
@@ -66,37 +80,6 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
       {...props}
       {...props}
     >
-      <Field>
-        <Label htmlFor={fields.email.id} className="sr-only">
-          Email
-        </Label>
-        <InputConform
-          meta={fields.email}
-          type="text"
-          className="w-full"
-          placeholder="name@example.com"
-          disabled={isLoading}
-        />
-        {fields.email.errors && <FieldError>{fields.email.errors}</FieldError>}
-        {isError && error?.response?.status === 409 && (
-          <FieldError>Email already exist</FieldError>
-        )}
-      </Field>
-      <Field>
-        <Label htmlFor={fields.username.id} className="sr-only">
-          Username
-        </Label>
-        <InputConform
-          meta={fields.username}
-          type="text"
-          placeholder="username"
-          className="w-full"
-          disabled={isLoading}
-        />
-        {fields.username.errors && (
-          <FieldError>{fields.username.errors}</FieldError>
-        )}
-      </Field>
       <Field>
         <Label htmlFor={fields.password.id} className="sr-only">
           Password
@@ -138,6 +121,7 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
         {fields.confirm.errors && (
           <FieldError>{fields.confirm.errors}</FieldError>
         )}
+        {isError && <FieldError>{error?.response?.data.message}</FieldError>}
       </Field>
       <Button
         className="w-full"
@@ -145,7 +129,7 @@ export const SignUpForm: FC<SignUpFormProps> = ({ className, ...props }) => {
         type="submit"
         disabled={isLoading}
       >
-        {isLoading ? <Loader className="h-5 w-5" /> : "Sign up"}
+        {isLoading ? <Loader className="h-5 w-5" /> : "Reset password"}
       </Button>
     </form>
   )
